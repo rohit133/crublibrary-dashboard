@@ -5,9 +5,10 @@ export interface User {
     image: string;
     apiKey: string;
     apiUrl: string;
-    creditsRemaining: number;
+    googleId: string;
     creditsUsed: number;
     canRecharge: boolean;
+    creditsRemaining: number;
     createdAt: Date;
   }
   

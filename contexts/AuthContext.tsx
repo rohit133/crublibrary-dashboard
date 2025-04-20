@@ -1,73 +1,71 @@
 "use client";
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-  Children,
-} from "react";
+import axios from "axios";
 import { User } from "@/types";
 import { toast } from "sonner";
+import { useGoogleLogin } from "@react-oauth/google";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   isAuthenticated: boolean;
-  login: () => Promise<void>;
+  login: (overrideConfig?: any) => void;
   logout: () => Promise<void>;
   refreshUserData: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined> (undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Mock Google authentication for this demonstration
-  const login = async () => {
-    try {
-      setLoading(true);
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+  const login = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        setLoading(true);
 
-      // Mock user: Generate mock user data with API key and URL
-      const mockUser: User = {
-        id: "user_" + Math.random().toString(36).substr(2, 9),
-        name: "Demo User",
-        email: "demo@example.com",
-        image: "https://ui-avatars.com/api/?name=Demo+User&background=random",
-        apiKey: "api_" + Math.random().toString(36).substr(2, 16),
-        apiUrl: "https://api.crudlibrary.com/v1",
-        creditsRemaining: 4,
-        creditsUsed: 0,
-        canRecharge: true,
-        createdAt: new Date(),
-      };
+        const { data } = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        });
 
-      /**
-       * Addd the google login logic here!!!
-       */
+        const googleUser: User = {
+          id: data.sub,
+          name: data.name,
+          email: data.email,
+          image: data.picture,
+          apiKey: "api_" + Math.random().toString(36).substr(2, 16),
+          apiUrl: "https://api.crudlibrary.com/v1",
+          googleId: data.sub,
+          creditsRemaining: 4,
+          creditsUsed: 0,
+          canRecharge: true,
+          createdAt: new Date(),
+        };
 
-      localStorage.setItem("user", JSON.stringify(mockUser));
-      setUser(mockUser);
-      toast.success("Logged in successfully!");
-    } catch (error) {
-      console.error("Login error: ", error);
-      toast.error("Failed to log in. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+        // Save user data to localStorage
+        localStorage.setItem("user", JSON.stringify(googleUser));
+        setUser(googleUser);
+        toast.success("Logged in successfully!");
+        
+      } catch (error) {
+        console.error("Google login error: ", error);
+        toast.error("Failed to log in. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    onError: () => {
+      toast.error("Google login failed. Please try again.");
+    },
+  });
 
-  // Logout
   const logout = async () => {
     try {
       setLoading(true);
       localStorage.removeItem("user");
       setUser(null);
-      toast.success("Loged out successfully");
+      toast.success("Logged out successfully");
     } catch (error) {
       console.error("Logout error: ", error);
       toast.error("Failed to log out. Please try again.");
@@ -88,27 +86,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    // Check for Saved user on initial load
-    if (typeof window !== undefined) {
-      const savedUser = localStorage.getItem("user");
-      if (savedUser) {
-        setUser(JSON.parse(savedUser));
-      }
-      setLoading(false);
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
     }
+    setLoading(false);
   }, []);
 
-  return ( 
+  return (
     <AuthContext.Provider value={{ user, loading, isAuthenticated: !!user, login, logout, refreshUserData }}>
-        {children}
+      {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if(context === undefined){
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
-    return context;
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 };
