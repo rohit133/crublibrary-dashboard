@@ -7,7 +7,6 @@ const RECHARGE_CREDIT_AMOUNT = 4;
 
 export async function POST(request: Request) {
   try {
-    // Assuming userId is passed in the body
     const { userId } = await request.json(); 
     
     if (!userId) {
@@ -17,13 +16,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // Recharge credits using our utility function
     const updatedUser = await rechargeUserCredits(userId, RECHARGE_CREDIT_AMOUNT);
     
-    // Record this API usage
     await recordApiUsage(userId, '/api/credits/recharge', 'POST', 200);
 
-    // Return only necessary data
     const responseData = {
       id: updatedUser.id,
       email: updatedUser.email,

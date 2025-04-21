@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { Clipboard, Check, Eye, EyeOff } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 
 export const ApiInfoCard = () => {
     const { user } = useAuth();

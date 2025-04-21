@@ -23,7 +23,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     onSuccess: async (tokenResponse) => {
       try {
         setLoading(true);
-
         const googleInfo = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
           headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
         });
@@ -34,7 +33,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           name: googleInfo.data.name,
           picture: googleInfo.data.picture
         });
-
+        
         if (authResponse.success && authResponse.data) {
           const userData: User = {
             id: authResponse.data.id,
@@ -50,6 +49,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             createdAt: new Date(),
             updatedAt: new Date()
           };
+          console.log("DEBUG: Constructed userData object for state:", userData);
 
           // Save user data to localStorage
           localStorage.setItem("user", JSON.stringify(userData));
@@ -89,20 +89,56 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const refreshUserData = async () => {
-    try {
-      const userData = localStorage.getItem("user");
-      if (userData) {
-        setUser(JSON.parse(userData));
-      }
-    } catch (error) {
-      console.error("Error refreshing user data:", error);
+    if (!user || !user.id) {
+        console.error("No user logged in, cannot refresh data.");
+        return;
     }
-  };
+    setLoading(true);
+    try {
+        const response = await axios.get("/api/user/me", {
+            headers: { 'X-User-ID': user.id }
+        });
+        if (response.data && response.data.success) {
+            const latestUserDataBackend = response.data.data;
+            const updatedUser: User = {
+                id: latestUserDataBackend.id,
+                name: latestUserDataBackend.name || null,
+                email: latestUserDataBackend.email,
+                image: latestUserDataBackend.image || null,
+                apiKey: latestUserDataBackend.apiKey,
+                apiUrl: latestUserDataBackend.apiUrl || "https://api.crudlibrary.com/v1",
+                googleId: user.googleId, // Keep original googleId from login state
+                credits: latestUserDataBackend.creditsRemaining,
+                creditsUsed: latestUserDataBackend.creditsUsed,
+                recharged: !latestUserDataBackend.canRecharge,
+                createdAt: user.createdAt || new Date(),
+                updatedAt: new Date()
+            };
+            setUser(updatedUser);
+            localStorage.setItem("user", JSON.stringify(updatedUser));
+            toast.success("User data refreshed");
+        } else {
+            toast.error("Failed to refresh user data: " + (response.data.message || "Unknown error"));
+        }
+    } catch (error) {
+        console.error("Error refreshing user data:", error);
+        toast.error("Failed to refresh user data. Please try again.");
+    } finally {
+        setLoading(false);
+    }
+};
+
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
     if (savedUser) {
       try {
-        setUser(JSON.parse(savedUser));
+        const parsedUser = JSON.parse(savedUser);
+        if (parsedUser && parsedUser.id) {
+            setUser(parsedUser);
+        } else {
+             console.error("Parsed user data invalid", parsedUser);
+             localStorage.removeItem("user");
+        }
       } catch (e) {
         console.error("Error parsing saved user data", e);
         localStorage.removeItem("user");
@@ -110,7 +146,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
     setLoading(false);
   }, []);
-
+  
   return (
     <AuthContext.Provider value={{ user, loading, isAuthenticated: !!user, login, logout, refreshUserData }}>
       {children}

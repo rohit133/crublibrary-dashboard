@@ -74,6 +74,8 @@ export async function POST(request: Request) {
       canRecharge: !user.recharged,
     };
 
+    console.log("DEBUG: Sending user data to frontend:", userClientData);
+
     return NextResponse.json({
       success: true,
       data: userClientData,
