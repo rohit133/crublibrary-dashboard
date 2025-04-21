@@ -1,9 +1,9 @@
 "use client"
 import React from 'react'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/AuthContext'
+import { usePathname, useRouter } from 'next/navigation'
 
 
 const Header: React.FC = () => {
@@ -33,9 +33,8 @@ const Header: React.FC = () => {
             {isAuthenticated && (
               <>
                 <Link href="/dashboard"
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    pathname === '/dashboard' ? 'text-white-600 bg-white-50' : 'text-white-600 hover:text-black hover:bg-gray-200'
-                  }`}
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${pathname === '/dashboard' ? 'text-white-600 bg-white-50' : 'text-white-600 hover:text-black hover:bg-gray-200'
+                    }`}
                 >
                   Dashboard
                 </Link>
@@ -57,9 +56,9 @@ const Header: React.FC = () => {
                   <span className="text-sm font-medium">{user?.name}</span>
                   <span className="text-xs text-gray-400">{user?.email}</span>
                 </div>
-                <Button 
-                  variant="outline" 
-                  onClick={logout} 
+                <Button
+                  variant="outline"
+                  onClick={logout}
                   className="border-gray-300"
                 >
                   Log out
@@ -67,12 +66,12 @@ const Header: React.FC = () => {
               </div>
             ) : (
               <Link href="/" passHref>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="border-gray-300"
-                  onClick={handleAuth}  
+                  onClick={handleAuth}
                 >
-                    Sign In 
+                  Sign In
                 </Button>
               </Link>
             )}

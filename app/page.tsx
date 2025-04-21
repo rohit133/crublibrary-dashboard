@@ -13,8 +13,7 @@ export default function Home() {
     if (isAuthenticated) {
       router.push('/dashboard');
     } else {
-      await login();
-      router.push('/dashboard');
+      login();
     }
   };
 
@@ -33,12 +32,7 @@ export default function Home() {
           <Button
             onClick={handleAuth}
             disabled={loading}
-            className="
-              px-8 py-6 text-lg 
-              bg-brand-600 hover:bg-brand-700 
-              dark:bg-brand-500 dark:hover:bg-brand-600
-              border
-            "
+            className=" px-8 py-6 text-lg bg-brand-600 hover:bg-brand-700 dark:bg-brand-500 dark:hover:bg-brand-600 border"
           >
             {loading ? 'Loading...' : isAuthenticated ? 'Go to Dashboard' : 'Sign in with Google'}
             <ArrowRight className="ml-2 h-5 w-5" />

@@ -16,8 +16,8 @@ export interface User {
     id: string;
     value: number;
     txHash: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: Date | null;
+    updatedAt: Date | null;
   }
   
   export interface ApiResponse<T> {
