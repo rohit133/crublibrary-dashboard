@@ -1,4 +1,4 @@
-import React, { use, useState } from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,11 +23,19 @@ export const ApiInfoCard = () => {
     }
 
     const handleCopyApiUrl = () => {
-        navigator.clipboard.writeText(user.apiUrl);
-        setApiUrlCopied(true);
-        toast.success('API URL copied to clipboard');
-        setTimeout(() => setApiUrlCopied(false), 2000);
+        // Add a null check to handle the case when apiUrl is null
+        if (user.apiUrl) {
+            navigator.clipboard.writeText(user.apiUrl);
+            setApiUrlCopied(true);
+            toast.success('API URL copied to clipboard');
+            setTimeout(() => setApiUrlCopied(false), 2000);
+        } else {
+            toast.error('API URL not available');
+        }
     }
+
+    // Default API URL if user.apiUrl is null
+    const apiUrl = user.apiUrl || 'https://api.crudlibrary.com/v1';
 
     return (
         <Card className="shadow-md card-gradient">
@@ -44,7 +52,7 @@ export const ApiInfoCard = () => {
                         </Button>
                     </div>
                     <div className="p-3 rounded-md border border-gray-200 font-mono text-sm break-all">
-                        {user.apiUrl}
+                        {apiUrl}
                     </div>
                 </div>
 
@@ -74,4 +82,3 @@ export const ApiInfoCard = () => {
         </Card>
     );
 };
-

@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { rechargeUserCredits } from '@/lib/db/users';
+import { recordApiUsage } from '@/lib/db/apiUsage';
 
 // Define how many credits are added on recharge
 const RECHARGE_CREDIT_AMOUNT = 4;
 
 export async function POST(request: Request) {
   try {
-    // TODO: Implement proper authentication to get the user ID from the session/token
-    // For now, assuming userId is passed in the body, which is insecure for a real app.
+    // Assuming userId is passed in the body
     const { userId } = await request.json(); 
     
     if (!userId) {
@@ -17,44 +17,18 @@ export async function POST(request: Request) {
       );
     }
 
-    // Get user by their internal ID using Prisma
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-    });
+    // Recharge credits using our utility function
+    const updatedUser = await rechargeUserCredits(userId, RECHARGE_CREDIT_AMOUNT);
     
-    if (!user) {
-      return NextResponse.json(
-        { success: false, message: 'User not found' },
-        { status: 404 }
-      );
-    }
-    
-    // Check if user can recharge
-    if (!user.canRecharge) {
-      return NextResponse.json(
-        { success: false, message: 'Recharge not available or already used.' },
-        { status: 403 }
-      );
-    }
-    
-    // Add credits and set canRecharge to false using Prisma
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: {
-        creditsRemaining: user.creditsRemaining + RECHARGE_CREDIT_AMOUNT,
-        canRecharge: false,
-      },
-    });
-
-    // TODO: Consider recording API usage if needed (removed for now)
-    // await recordApiUsage(userId, '/api/credits/recharge', 'POST', 200);
+    // Record this API usage
+    await recordApiUsage(userId, '/api/credits/recharge', 'POST', 200);
 
     // Return only necessary data
     const responseData = {
       id: updatedUser.id,
       email: updatedUser.email,
-      creditsRemaining: updatedUser.creditsRemaining,
-      canRecharge: updatedUser.canRecharge,
+      credits: updatedUser.credits,
+      recharged: updatedUser.recharged,
     };
 
     return NextResponse.json({
@@ -65,6 +39,21 @@ export async function POST(request: Request) {
     
   } catch (error) {
     console.error('Credit recharge error:', error);
+    
+    if (error instanceof Error && error.message === 'User has already recharged') {
+      return NextResponse.json(
+        { success: false, message: 'Recharge not available or already used.' },
+        { status: 403 }
+      );
+    }
+    
+    if (error instanceof Error && error.message === 'User not found') {
+      return NextResponse.json(
+        { success: false, message: 'User not found' },
+        { status: 404 }
+      );
+    }
+    
     const errorMessage = error instanceof Error ? error.message : 'Unknown error during recharge';
     return NextResponse.json(
       { 

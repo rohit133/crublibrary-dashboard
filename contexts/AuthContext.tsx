@@ -13,7 +13,6 @@ interface AuthContextType {
   logout: () => Promise<void>;
   refreshUserData: () => Promise<void>;
 }
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -25,29 +24,41 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         setLoading(true);
 
-        const { data } = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
+        const googleInfo = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
           headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
         });
 
-        const googleUser: User = {
-          id: data.sub,
-          name: data.name,
-          email: data.email,
-          image: data.picture,
-          apiKey: "api_" + Math.random().toString(36).substr(2, 16),
-          apiUrl: "https://api.crudlibrary.com/v1",
-          googleId: data.sub,
-          creditsRemaining: 4,
-          creditsUsed: 0,
-          canRecharge: true,
-          createdAt: new Date(),
-        };
+        const { data: authResponse } = await axios.post("/api/auth/google/callback", {
+          googleId: googleInfo.data.sub,
+          email: googleInfo.data.email,
+          name: googleInfo.data.name,
+          picture: googleInfo.data.picture
+        });
 
-        // Save user data to localStorage
-        localStorage.setItem("user", JSON.stringify(googleUser));
-        setUser(googleUser);
-        toast.success("Logged in successfully!");
-        
+        if (authResponse.success && authResponse.data) {
+          const userData: User = {
+            id: authResponse.data.id,
+            name: authResponse.data.name || null,
+            email: authResponse.data.email,
+            image: authResponse.data.image || null,
+            apiKey: authResponse.data.apiKey,
+            apiUrl: authResponse.data.apiUrl || "https://api.crudlibrary.com/v1",
+            googleId: googleInfo.data.sub,
+            credits: authResponse.data.creditsRemaining, 
+            creditsUsed: authResponse.data.creditsUsed,
+            recharged: !authResponse.data.canRecharge, 
+            createdAt: new Date(),
+            updatedAt: new Date()
+          };
+
+          // Save user data to localStorage
+          localStorage.setItem("user", JSON.stringify(userData));
+          setUser(userData);
+          toast.success("Logged in successfully!");
+        } else {
+          toast.error("Authentication failed: " + (authResponse.message || "Unknown error"));
+        }
+
       } catch (error) {
         console.error("Google login error: ", error);
         toast.error("Failed to log in. Please try again.");
@@ -55,10 +66,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setLoading(false);
       }
     },
-    onError: () => {
+    onError: (errorResponse) => {
+      console.error("Login error:", errorResponse);
       toast.error("Google login failed. Please try again.");
     },
+    flow: "implicit",
   });
+
 
   const logout = async () => {
     try {
@@ -84,11 +98,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.error("Error refreshing user data:", error);
     }
   };
-
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (e) {
+        console.error("Error parsing saved user data", e);
+        localStorage.removeItem("user");
+      }
     }
     setLoading(false);
   }, []);

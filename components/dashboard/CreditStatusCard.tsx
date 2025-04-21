@@ -2,10 +2,10 @@ import React from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { MailIcon } from 'lucide-react';
-import CrudLibrary from '@/lib/CrudLibrary';
 import { useAuth } from "@/contexts/AuthContext";
 import { Progress } from '@/components/ui/progress';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
+import axios from "axios";
 
 export const CreditStatusCard = () => {
     const { user, refreshUserData } = useAuth();
@@ -13,19 +13,28 @@ export const CreditStatusCard = () => {
         return null;
     }
 
-    const totalCredits = user.creditsUsed + user.creditsRemaining;
+    const totalCredits = user.creditsUsed + user.credits;
     const percentUsed = totalCredits > 0 ? (user.creditsUsed / totalCredits) * 100 : 0;
+    const canRecharge = !user.recharged;
 
     const handleRechargeRequest = async () => {
         if (!user) return;
         try {
-            const library = new CrudLibrary(user.apiKey, user.apiUrl);
-            const response = await library.requestCreditRecharge();
-            toast.success(response.message);
-            refreshUserData();
+            // Call our backend API instead of using CrudLibrary directly
+            const response = await axios.post("/api/credits/recharge", {
+                userId: user.id
+            });
+            
+            if (response.data.success) {
+                toast.success(response.data.message);
+                await refreshUserData();
+            } else {
+                toast.error(response.data.message || "Failed to recharge credits");
+            }
         } catch (error: any) {
             console.error('Recharge error:', error);
-            toast.error(error?.message || 'An error occurred while processing your recharge request');
+            const errorMessage = error?.response?.data?.message || error?.message || 'An error occurred while processing your recharge request';
+            toast.error(errorMessage);
         }
     };
 
@@ -41,7 +50,7 @@ export const CreditStatusCard = () => {
                 <div>
                     <div className="flex justify-between items-center mb-2">
                         <span className="text-sm font-medium">
-                            {user.creditsRemaining} credits remaining
+                            {user.credits} credits remaining
                         </span>
                         <span className="text-sm text-gray-500">
                             {user.creditsUsed} used
@@ -56,8 +65,8 @@ export const CreditStatusCard = () => {
                     <p className="text-sm mb-4">
                         Send an email to <span className="font-medium">hirings@formpilot.org</span> with the subject "Please recharge my credits"
                     </p>
-                    {user.canRecharge ? (
-                        <Button variant="outline" size="sm" className="flex items-center gap-2  text-white-700 hover:text-gray-800 hover:bg-gray-100" onClick={handleRechargeRequest}>
+                    {canRecharge ? (
+                        <Button variant="outline" size="sm" className="flex items-center gap-2 text-white-700 hover:text-gray-800 hover:bg-gray-100" onClick={handleRechargeRequest}>
                             <MailIcon className="h-4 w-4" />
                             <span>Simulate Email Request</span>
                         </Button>
