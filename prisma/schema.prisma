@@ -33,7 +33,7 @@ model Item {
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String
   value        Float
-  txHash       String
+  txHash       String    @unique
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 }

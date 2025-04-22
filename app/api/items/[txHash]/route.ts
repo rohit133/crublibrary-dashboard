@@ -4,37 +4,25 @@ import { NextRequest } from "next/server";
 import { validateKeyAndDecrementCredits } from "@/lib/api-utils";
 import { corsHeaders } from "@/lib/cors-header";
 
-
 /**
- * @description API route handler for fetching a specific item by its ID.
- * Authenticates the request, validates the API key, decrements credits, and retrieves the item if it belongs to the user.
- * @param { NextRequest} request - The incoming Next.js request object. Must contain 'Authorization' or 'X-API-Key' header.
- * @param {{ params: { id: string } }} params - The route parameters, containing the item ID.
- * @returns { Promise<NextResponse> } A promise that resolves to a Next.js response object.
- * Returns 200 with the item data ({ value, txHash }) on success.
- * Returns 401 if the API key is missing.
- * Returns 400 if the item ID format is invalid.
- * Returns 402 or 403 if API key validation fails.
- * Returns 404 if the item is not found or does not belong to the user.
- * Returns 500 for internal server errors or unexpected validation failures.
+ * @description API route handler for fetching a specific item by its txHash.
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  context: { params: { txHash: string } }
 ): Promise<NextResponse> {
   const apiKey =
     request.headers.get("Authorization")?.split("Bearer ")[1] ||
     request.headers.get("X-API-Key");
-  const { id } = await params;
+  const { txHash } = context.params;
 
   if (!apiKey) {
     return NextResponse.json({ message: "API Key missing" }, { status: 401, headers: corsHeaders });
   }
 
-  if (!id || isNaN(parseInt(id))) {
-    return NextResponse.json({ message: "Invalid ID format" }, { status: 400, headers: corsHeaders });
+  if (!txHash || typeof txHash !== "string") {
+    return NextResponse.json({ message: "Invalid txHash format" }, { status: 400, headers: corsHeaders });
   }
-  const itemId = parseInt(id);
 
   try {
     const validationResult = await validateKeyAndDecrementCredits(apiKey);
@@ -52,9 +40,9 @@ export async function GET(
       );
     }
 
-    const item = await prisma.item.findUnique({
+    const item = await prisma.item.findFirst({
       where: {
-        id: itemId,
+        txHash,
         userId: user.id,
       },
       select: { value: true, txHash: true },
@@ -66,7 +54,7 @@ export async function GET(
 
     return NextResponse.json(item, { status: 200, headers: corsHeaders });
   } catch (error) {
-    console.error(`GET /api/items/${id} Error:`, error);
+    console.error(`GET /api/items/${txHash} Error:`, error);
     return NextResponse.json(
       { message: "Internal Server Error" },
       { status: 500, headers: corsHeaders }
@@ -75,35 +63,24 @@ export async function GET(
 }
 
 /**
- * @description API route handler for updating a specific item by its ID.
- * Authenticates the request, validates the API key, decrements credits, and updates the item if it belongs to the user.
- * @param {NextRequest} request - The incoming Next.js request object. Must contain 'Authorization' or 'X-API-Key' header and a JSON body with optional 'value' (number) and/or 'txHash' (string).
- * @param {{ params: { id: string } }} params - The route parameters, containing the item ID.
- * @returns {Promise<NextResponse>} A promise that resolves to a Next.js response object.
- * Returns 200 with { status: "updated successfully" } on success.
- * Returns 401 if the API key is missing.
- * Returns 400 if the item ID format is invalid, the input body is invalid/malformed JSON, or no update data is provided.
- * Returns 402 or 403 if API key validation fails.
- * Returns 404 if the item is not found or does not belong to the user.
- * Returns 500 for internal server errors or unexpected validation failures.
+ * @description API route handler for updating a specific item by its txHash.
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { txHash: string } }
 ): Promise<NextResponse> {
   const apiKey =
     request.headers.get("Authorization")?.split("Bearer ")[1] ||
     request.headers.get("X-API-Key");
-  const { id } = await params;
+  const { txHash } = params;
 
   if (!apiKey) {
     return NextResponse.json({ message: "API Key missing" }, { status: 401, headers: corsHeaders });
   }
 
-  if (!id || isNaN(parseInt(id))) {
-    return NextResponse.json({ message: "Invalid ID format" }, { status: 400, headers: corsHeaders });
+  if (!txHash || typeof txHash !== "string") {
+    return NextResponse.json({ message: "Invalid txHash format" }, { status: 400, headers: corsHeaders });
   }
-  const itemId = parseInt(id);
 
   try {
     const validationResult = await validateKeyAndDecrementCredits(apiKey);
@@ -122,9 +99,9 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { value, txHash } = body;
+    const { value, txHash: newTxHash } = body;
 
-    if (value === undefined && txHash === undefined) {
+    if (value === undefined && newTxHash === undefined) {
       return NextResponse.json(
         { message: "No update data provided" },
         { status: 400, headers: corsHeaders }
@@ -136,7 +113,7 @@ export async function PUT(
         { status: 400, headers: corsHeaders }
       );
     }
-    if (txHash !== undefined && typeof txHash !== "string") {
+    if (newTxHash !== undefined && typeof newTxHash !== "string") {
       return NextResponse.json(
         { message: "Invalid input: txHash must be a string" },
         { status: 400, headers: corsHeaders }
@@ -145,10 +122,10 @@ export async function PUT(
 
     const updateData: { value?: number; txHash?: string } = {};
     if (value !== undefined) updateData.value = value;
-    if (txHash !== undefined) updateData.txHash = txHash;
+    if (newTxHash !== undefined) updateData.txHash = newTxHash;
 
     const updateResult = await prisma.item.updateMany({
-      where: { id: itemId, userId: user.id },
+      where: { txHash, userId: user.id },
       data: updateData,
     });
 
@@ -164,7 +141,7 @@ export async function PUT(
       { status: 200, headers: corsHeaders }
     );
   } catch (error) {
-    console.error(`PUT /api/items/${id} Error:`, error);
+    console.error(`PUT /api/items/${txHash} Error:`, error);
     if (error instanceof SyntaxError) {
       return NextResponse.json(
         { message: "Invalid JSON body" },
@@ -179,35 +156,24 @@ export async function PUT(
 }
 
 /**
- * @description API route handler for deleting a specific item by its ID.
- * Authenticates the request, validates the API key, decrements credits, and deletes the item if it belongs to the user.
- * @param {NextRequest} request - The incoming Next.js request object. Must contain 'Authorization' or 'X-API-Key' header.
- * @param {{ params: { id: string } }} params - The route parameters, containing the item ID.
- * @returns {Promise<NextResponse>} A promise that resolves to a Next.js response object.
- * Returns 200 with { status: "deleted successfully" } on success.
- * Returns 401 if the API key is missing.
- * Returns 400 if the item ID format is invalid.
- * Returns 402 or 403 if API key validation fails.
- * Returns 404 if the item is not found or does not belong to the user.
- * Returns 500 for internal server errors or unexpected validation failures.
+ * @description API route handler for deleting a specific item by its txHash.
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { txHash: string } }
 ): Promise<NextResponse> {
   const apiKey =
     request.headers.get("Authorization")?.split("Bearer ")[1] ||
     request.headers.get("X-API-Key");
-  const { id } = await params;
+  const { txHash } = params;
 
   if (!apiKey) {
     return NextResponse.json({ message: "API Key missing" }, { status: 401, headers: corsHeaders });
   }
 
-  if (!id || isNaN(parseInt(id))) {
-    return NextResponse.json({ message: "Invalid ID format" }, { status: 400, headers: corsHeaders });
+  if (!txHash || typeof txHash !== "string") {
+    return NextResponse.json({ message: "Invalid txHash format" }, { status: 400, headers: corsHeaders });
   }
-  const itemId = parseInt(id);
 
   try {
     const validationResult = await validateKeyAndDecrementCredits(apiKey);
@@ -226,7 +192,7 @@ export async function DELETE(
     }
 
     const deleteResult = await prisma.item.deleteMany({
-      where: { id: itemId, userId: user.id },
+      where: { txHash, userId: user.id },
     });
 
     if (deleteResult.count === 0) {
@@ -241,7 +207,7 @@ export async function DELETE(
       { status: 200, headers: corsHeaders }
     );
   } catch (error) {
-    console.error(`DELETE /api/items/${id} Error:`, error);
+    console.error(`DELETE /api/items/${txHash} Error:`, error);
     return NextResponse.json(
       { message: "Internal Server Error" },
       { status: 500, headers: corsHeaders }

@@ -5993,16 +5993,16 @@ export namespace Prisma {
 
   export type ItemWhereUniqueInput = Prisma.AtLeast<{
     id?: number
+    txHash?: string
     AND?: ItemWhereInput | ItemWhereInput[]
     OR?: ItemWhereInput[]
     NOT?: ItemWhereInput | ItemWhereInput[]
     userId?: StringFilter<"Item"> | string
     value?: FloatFilter<"Item"> | number
-    txHash?: StringFilter<"Item"> | string
     createdAt?: DateTimeFilter<"Item"> | Date | string
     updatedAt?: DateTimeFilter<"Item"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-  }, "id">
+  }, "id" | "txHash">
 
   export type ItemOrderByWithAggregationInput = {
     id?: SortOrder
