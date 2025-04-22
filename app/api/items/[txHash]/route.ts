@@ -9,12 +9,12 @@ import { corsHeaders } from "@/lib/cors-header";
  */
 export async function GET(
   request: NextRequest,
-  context: { params: { txHash: string } }
+  { params }: { params: Promise<{ txHash: string }> }
 ): Promise<NextResponse> {
   const apiKey =
     request.headers.get("Authorization")?.split("Bearer ")[1] ||
     request.headers.get("X-API-Key");
-  const { txHash } = context.params;
+  const { txHash } = await params;
 
   if (!apiKey) {
     return NextResponse.json({ message: "API Key missing" }, { status: 401, headers: corsHeaders });
@@ -67,12 +67,12 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { txHash: string } }
+  { params }: { params: Promise<{ txHash: string }> }
 ): Promise<NextResponse> {
   const apiKey =
     request.headers.get("Authorization")?.split("Bearer ")[1] ||
     request.headers.get("X-API-Key");
-  const { txHash } = params;
+  const { txHash } = await params;
 
   if (!apiKey) {
     return NextResponse.json({ message: "API Key missing" }, { status: 401, headers: corsHeaders });
@@ -160,12 +160,12 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { txHash: string } }
+  { params }: { params: Promise<{ txHash: string }> }
 ): Promise<NextResponse> {
   const apiKey =
     request.headers.get("Authorization")?.split("Bearer ")[1] ||
     request.headers.get("X-API-Key");
-  const { txHash } = params;
+  const { txHash } = await params;
 
   if (!apiKey) {
     return NextResponse.json({ message: "API Key missing" }, { status: 401, headers: corsHeaders });
