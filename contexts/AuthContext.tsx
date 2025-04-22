@@ -15,10 +15,24 @@ interface AuthContextType {
 }
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/**
+ * @description Provides authentication state and actions to the application.
+ * Manages user state, loading status, and provides login, logout, and data refresh functions.
+ * Persists user data in localStorage.
+ * @param {object} props - The component props.
+ * @param {React.ReactNode} props.children - The child components to wrap with the provider.
+ */
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  /**
+   * @description Initiates the Google login flow using @react-oauth/google.
+   * On success, fetches user info from Google, sends it to the backend for validation/creation,
+   * updates the user state, and stores user data in localStorage.
+   * Displays toast notifications for success or failure.
+   * @param {any} [overrideConfig] - Optional configuration overrides for the Google login hook.
+   */
   const login = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
@@ -72,7 +86,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     flow: "implicit",
   });
 
-
+  /**
+   * @description Logs the user out by clearing the user state and removing user data from localStorage.
+   * Displays toast notifications.
+   * @returns {Promise<void>}
+   */
   const logout = async () => {
     try {
       setLoading(true);
@@ -87,6 +105,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  /**
+   * @description Refreshes the current user's data by fetching the latest details from the backend API.
+   * Updates the user state and localStorage if successful.
+   * Requires a user to be logged in.
+   * Displays toast notifications on failure.
+   * @returns {Promise<void>}
+   */
   const refreshUserData = async () => {
     if (!user || !user.id) {
         console.error("No user logged in, cannot refresh data.");
@@ -151,6 +176,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+/**
+ * @description Custom hook to access the authentication context.
+ * Must be used within a component wrapped by AuthProvider.
+ * @returns {AuthContextType} The authentication context value (user, loading, isAuthenticated, login, logout, refreshUserData).
+ * @throws {Error} If used outside of an AuthProvider.
+ */
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

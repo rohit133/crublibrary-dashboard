@@ -67,10 +67,10 @@ export const CreditStatusCard = () => {
                         <div>
                             <div className="flex justify-between items-center mb-2">
                                 <span className="text-sm font-medium">
-                                    {user.credits} credits remaining
-                                </span>
-                                <span className="text-sm text-gray-500">
                                     {user.creditsUsed} used
+                                </span>
+                                <span className="text-sm font-medium">
+                                    {user.credits} credits remaining
                                 </span>
                             </div>
                             <Progress value={percentUsed}  />

@@ -4,13 +4,18 @@ import { NextRequest } from "next/server";
 import { validateKeyAndDecrementCredits } from "@/lib/api-utils";
 
 /**
- * @description API route to handle GET, PUT, and DELETE requests for items.
- * @param request - The incoming request object.
- * @param params - The route parameters.
- * @returns { NextResponse } - The response object.
+ * @description API route handler for fetching a specific item by its ID.
+ * Authenticates the request, validates the API key, decrements credits, and retrieves the item if it belongs to the user.
+ * @param {NextRequest} request - The incoming Next.js request object. Must contain 'Authorization' or 'X-API-Key' header.
+ * @param {{ params: { id: string } }} params - The route parameters, containing the item ID.
+ * @returns {Promise<NextResponse>} A promise that resolves to a Next.js response object.
+ * Returns 200 with the item data ({ value, txHash }) on success.
+ * Returns 401 if the API key is missing.
+ * Returns 400 if the item ID format is invalid.
+ * Returns 402 or 403 if API key validation fails.
+ * Returns 404 if the item is not found or does not belong to the user.
+ * Returns 500 for internal server errors or unexpected validation failures.
  */
-
-
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   const apiKey = request.headers.get('Authorization')?.split('Bearer ')[1] || request.headers.get('X-API-Key');
   const id = params.id;
@@ -57,6 +62,19 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
+/**
+ * @description API route handler for updating a specific item by its ID.
+ * Authenticates the request, validates the API key, decrements credits, and updates the item if it belongs to the user.
+ * @param {NextRequest} request - The incoming Next.js request object. Must contain 'Authorization' or 'X-API-Key' header and a JSON body with optional 'value' (number) and/or 'txHash' (string).
+ * @param {{ params: { id: string } }} params - The route parameters, containing the item ID.
+ * @returns {Promise<NextResponse>} A promise that resolves to a Next.js response object.
+ * Returns 200 with { status: "updated successfully" } on success.
+ * Returns 401 if the API key is missing.
+ * Returns 400 if the item ID format is invalid, the input body is invalid/malformed JSON, or no update data is provided.
+ * Returns 402 or 403 if API key validation fails.
+ * Returns 404 if the item is not found or does not belong to the user.
+ * Returns 500 for internal server errors or unexpected validation failures.
+ */
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   const apiKey = request.headers.get('Authorization')?.split('Bearer ')[1] || request.headers.get('X-API-Key');
   const id = params.id;
@@ -120,6 +138,19 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
+/**
+ * @description API route handler for deleting a specific item by its ID.
+ * Authenticates the request, validates the API key, decrements credits, and deletes the item if it belongs to the user.
+ * @param {NextRequest} request - The incoming Next.js request object. Must contain 'Authorization' or 'X-API-Key' header.
+ * @param {{ params: { id: string } }} params - The route parameters, containing the item ID.
+ * @returns {Promise<NextResponse>} A promise that resolves to a Next.js response object.
+ * Returns 200 with { status: "deleted successfully" } on success.
+ * Returns 401 if the API key is missing.
+ * Returns 400 if the item ID format is invalid.
+ * Returns 402 or 403 if API key validation fails.
+ * Returns 404 if the item is not found or does not belong to the user.
+ * Returns 500 for internal server errors or unexpected validation failures.
+ */
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   const apiKey = request.headers.get('Authorization')?.split('Bearer ')[1] || request.headers.get('X-API-Key');
   const id = params.id;

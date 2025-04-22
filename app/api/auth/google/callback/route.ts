@@ -2,6 +2,18 @@ import { prisma } from '@/lib/db';
 import { NextResponse } from 'next/server';
 import { generateApiKey } from '@/lib/api-key-utils';
 
+/**
+ * @description API route handler for Google OAuth callback.
+ * Receives user information (googleId, email, name, picture) from the frontend after Google sign-in.
+ * Finds an existing user by googleId or creates a new user if one doesn't exist, generating an API key.
+ * Updates user name and picture if they have changed.
+ * Returns user data needed for the client-side session.
+ * @param {Request} request - The incoming request object. Must contain a JSON body with 'googleId', 'email', and optionally 'name' and 'picture'.
+ * @returns {Promise<NextResponse>} A promise that resolves to a Next.js response object.
+ * Returns 200 with { success: true, data: userClientData, message: 'Authentication successful' } on success.
+ * Returns 400 if required user information (googleId, email) is missing.
+ * Returns 500 for database errors during user lookup, creation, or update, or other internal server errors.
+ */
 export async function POST(request: Request) {
   try {
     const requestBody = await request.json();

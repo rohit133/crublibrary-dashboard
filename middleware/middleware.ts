@@ -2,6 +2,15 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { validateKeyAndDecrementCredits } from '@/lib/api-utils';
 
+/**
+ * @description Next.js middleware to intercept requests to /api/items/*.
+ * Validates the API key provided in the 'Authorization' or 'X-API-Key' header.
+ * If the key is valid and the user has credits, it decrements the credits and adds the internal 'X-User-ID' header to the request before passing it on.
+ * If validation fails or an error occurs, it returns an appropriate JSON error response.
+ * If the request path doesn't match /api/items/*, it passes the request through without modification.
+ * @param {NextRequest} request - The incoming Next.js request object.
+ * @returns {Promise<NextResponse>} A promise that resolves to a Next.js response object (either the modified request passed on, or an error response).
+ */
 export async function middleware(request: NextRequest) {
   if (!request.nextUrl.pathname.startsWith('/api/items')) {
     return NextResponse.next();

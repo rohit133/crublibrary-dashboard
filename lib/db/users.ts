@@ -1,7 +1,12 @@
 import { prisma } from '@/lib/db';
 
 /**
- * Get a user by their Google ID
+ * @description Retrieves a user's essential client-side data based on their Google ID.
+ * @param {string} googleId - The Google ID of the user to find.
+ * @returns {Promise<object | null>} A promise that resolves to an object containing user details 
+ * (id, email, name, image, googleId, apiKey, creditsRemaining, creditsUsed, canRecharge)
+ * or `null` if the user is not found.
+ * @throws {Error} If there is a database error during retrieval.
  */
 export async function getUserByGoogleId(googleId: string) {
   try {
@@ -18,7 +23,6 @@ export async function getUserByGoogleId(googleId: string) {
       image: user.image,
       googleId: user.googleId,
       apiKey: user.apiKey,
-      apiUrl: user.apiUrl,
       creditsRemaining: user.credits,
       creditsUsed: user.creditsUsed,
       canRecharge: !user.recharged,
@@ -30,7 +34,13 @@ export async function getUserByGoogleId(googleId: string) {
 }
 
 /**
- * Update user credits
+ * @description Updates the credit balance, usage count, and recharged status for a specific user.
+ * @param {string} userId - The internal ID of the user to update.
+ * @param {number} credits - The new credit balance.
+ * @param {number} creditsUsed - The new total credits used count.
+ * @param {boolean} recharged - The new recharged status.
+ * @returns {Promise<User>} A promise that resolves to the updated User object from Prisma.
+ * @throws {Error} If there is a database error during the update.
  */
 export async function updateUserCredits(
   userId: string, 
@@ -54,7 +64,15 @@ export async function updateUserCredits(
 }
 
 /**
- * Recharge user credits
+ * @description Adds a specified amount of credits to a user's balance and marks them as recharged.
+ * Checks if the user exists and has not already recharged before proceeding.
+ * Logs the recharge event.
+ * @param {string} userId - The internal ID of the user to recharge.
+ * @param {number} amount - The number of credits to add.
+ * @returns {Promise<User>} A promise that resolves to the updated User object from Prisma after recharge.
+ * @throws {Error} If the user is not found.
+ * @throws {Error} If the user has already recharged.
+ * @throws {Error} If there is a database error during the update or logging.
  */
 export async function rechargeUserCredits(userId: string, amount: number) {
   try {

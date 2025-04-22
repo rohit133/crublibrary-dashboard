@@ -3,7 +3,12 @@ import crypto from 'crypto';
 import { CrudItem } from '@/types';
 
 /**
- * Create a new CRUD item
+ * @description Creates a new CRUD item associated with a user.
+ * Generates a random transaction hash (txHash) for the item.
+ * @param {string} userId - The ID of the user creating the item.
+ * @param {number} value - The numerical value to store in the item.
+ * @returns {Promise<CrudItem>} A promise that resolves to the newly created CrudItem object.
+ * @throws {Error} If there is a database error during creation.
  */
 export async function createCrudItem(userId: string, value: number) {
   try {
@@ -33,7 +38,10 @@ export async function createCrudItem(userId: string, value: number) {
 }
 
 /**
- * Get all CRUD items for a user
+ * @description Retrieves all CRUD items for a specific user, ordered by creation date (descending).
+ * @param {string} userId - The ID of the user whose items are to be fetched.
+ * @returns {Promise<CrudItem[]>} A promise that resolves to an array of CrudItem objects.
+ * @throws {Error} If there is a database error during retrieval.
  */
 export async function getCrudItemsByUserId(userId: string) {
   try {
@@ -64,7 +72,12 @@ export async function getCrudItemsByUserId(userId: string) {
 }
 
 /**
- * Update a CRUD item
+ * @description Updates the value of an existing CRUD item.
+ * @param {string} idString - The string representation of the item's ID.
+ * @param {number} value - The new numerical value for the item.
+ * @returns {Promise<CrudItem>} A promise that resolves to the updated CrudItem object.
+ * @throws {Error} If the provided idString is not a valid number.
+ * @throws {Error} If there is a database error during the update.
  */
 export async function updateCrudItem(idString: string, value: number) {
   try {
@@ -94,7 +107,11 @@ export async function updateCrudItem(idString: string, value: number) {
 }
 
 /**
- * Delete a CRUD item
+ * @description Deletes a specific CRUD item by its ID.
+ * @param {string} idString - The string representation of the item's ID.
+ * @returns {Promise<boolean>} A promise that resolves to `true` if deletion was successful, `false` if the item was not found.
+ * @throws {Error} If the provided idString is not a valid number.
+ * @throws {Error} If there is a database error during deletion (other than not found).
  */
 export async function deleteCrudItem(idString: string) {
   try {

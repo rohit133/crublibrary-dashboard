@@ -4,9 +4,16 @@ import { NextRequest } from "next/server";
 import { validateKeyAndDecrementCredits } from "@/lib/api-utils";
 
 /**
- * @description API route to handle POST requests for creating items.
- * @param request - The incoming request object.
- * @returns { NextResponse } - The response object.
+ * @description API route handler for creating new items.
+ * Authenticates the request using an API key, validates it, and decrements credits.
+ * Creates a new item in the database with the provided value and transaction hash.
+ * @param {NextRequest} request - The incoming Next.js request object. Must contain 'Authorization' or 'X-API-Key' header and a JSON body with 'value' (number) and 'txHash' (string).
+ * @returns {Promise<NextResponse>} A promise that resolves to a Next.js response object.
+ * Returns 201 with the new item's ID on success.
+ * Returns 401 if the API key is missing.
+ * Returns 400 if the input body is invalid or malformed JSON.
+ * Returns 402 or 403 if API key validation fails (invalid key, insufficient credits).
+ * Returns 500 for internal server errors.
  */
 
 export async function POST(request: NextRequest) {

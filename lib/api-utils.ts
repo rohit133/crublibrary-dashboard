@@ -1,9 +1,17 @@
 import { prisma } from "@/lib/db";
 
 /**
- * @description Validates the API key, checks if the user has enough credits, and decrements the credits.
- * @param apiKey
- * @returns { user, error } @object
+ * @description Validates an API key, checks for sufficient credits, and decrements the credit count for the associated user.
+ * Finds a user by API key. If found and credits > 0, decrements credits and increments creditsUsed.
+ * @param {string} apiKey - The API key provided by the client.
+ * @returns {Promise<{ user: { id: string } | null, error: { status: number, message: string } | null }>} 
+ * An object containing:
+ *  - `user`: An object with the user's `id` if validation and decrement are successful, otherwise `null`.
+ *  - `error`: An object with `status` (HTTP status code) and `message` if validation fails or an error occurs, otherwise `null`.
+ * Possible errors:
+ *  - 403: Invalid API Key
+ *  - 429: Request limit exceeded (credits <= 0)
+ *  - 500: Internal server error during database operation
  */
 export async function validateKeyAndDecrementCredits(apiKey: string) {
     try {

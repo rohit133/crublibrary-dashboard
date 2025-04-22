@@ -2,6 +2,16 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { NextRequest } from "next/server";
 
+/**
+ * @description API route handler for fetching the current user's details.
+ * Retrieves user information based on the user ID provided in the 'X-User-ID' header.
+ * @param {NextRequest} request - The incoming Next.js request object. Must contain 'X-User-ID' header.
+ * @returns {Promise<NextResponse>} A promise that resolves to a Next.js response object.
+ * Returns 200 with user data { success: true, data: userClientData } on success.
+ * Returns 401 if the 'X-User-ID' header is missing.
+ * Returns 404 if the user is not found.
+ * Returns 500 for internal server errors.
+ */
 export async function GET(request: NextRequest) {
   const userId = request.headers.get('X-User-ID');
   if (!userId) {
@@ -17,7 +27,6 @@ export async function GET(request: NextRequest) {
         email: true,
         image: true,
         apiKey: true,
-        apiUrl: true,
         credits: true,
         creditsUsed: true,
         recharged: true,
@@ -35,7 +44,6 @@ export async function GET(request: NextRequest) {
         name: user.name,
         image: user.image,
         apiKey: user.apiKey,
-        apiUrl: user.apiUrl,
         creditsRemaining: user.credits,
         creditsUsed: user.creditsUsed,
         canRecharge: !user.recharged,
