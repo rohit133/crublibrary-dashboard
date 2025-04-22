@@ -14,7 +14,7 @@ export const ApiInfoCard = () => {
     if (!user) {
         return null;
     }
-    const baseUrl = process.env.NEXT_API_BASE_URL || 'https://crublibrary-dashboard-crud.vercel.app/dashboards';
+    const baseUrl = process.env.NEXT_API_BASE_URL || 'https://crublibrary-dashboard-crud.vercel.app';
     const apiUrl = `${baseUrl}/api`;
 
     
