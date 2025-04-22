@@ -2,7 +2,7 @@
 import React from "react";
 import { CopyButton } from "@/components/ui/copyButton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card";
 
 export const UsageGuideCard = () => {
   return (
@@ -28,11 +28,11 @@ export const UsageGuideCard = () => {
                 <p className="text-sm">
                   Install the library using npm, yarn, or pnpm:
                 </p>
-                <CopyButton text="npm install your-name-crud" />
+                <CopyButton text="npm install rohit-formpilot-crud" />
               </div>
               <pre className="bg-gray-900 text-gray-100 p-3 rounded-md overflow-x-auto">
                 <code className="font-mono text-sm">
-                  {`npm install your-name-crud`}
+                  {`npm install rohit-formpilot-crud`}
                 </code>
               </pre>
             </div>
@@ -70,8 +70,8 @@ export const UsageGuideCard = () => {
               </div>
               <pre className="bg-gray-900 text-gray-100 p-3 rounded-md overflow-x-auto">
                 <code className="font-mono text-sm">
-                  <div>import CrudLibrary from 'your-name-crud';</div>
-                  <div>const crudLib = new CrudLibrary(</div>
+                  <div>{`import { createCrudLibrary } from "rohit-formpilot-crud";`}</div>
+                  <div>const crudLib = createCrudLibrary(</div>
                   <div>&nbsp;&nbsp;process.env.CRUD_API_KEY,</div>
                   <div>&nbsp;&nbsp;process.env.CRUD_API_URL</div>
                   <div>);</div>

@@ -1,25 +1,24 @@
-import React, { useEffect } from "react";
+import axios from "axios";
+import React from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { MailIcon, RefreshCw } from 'lucide-react';
 import { useAuth } from "@/contexts/AuthContext";
 import { Progress } from '@/components/ui/progress';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
-import axios from "axios";
-import CrudLibrary from "@/lib/CrudLibrary";
+
 
 export const CreditStatusCard = () => {
     const { user, refreshUserData, loading } = useAuth();
     if (!user) {
         return null;
     }
-    console.log("DEBUG: CreditStatusCard user:", user);
 
     const totalCredits = user.creditsUsed + user.credits;
     const percentUsed = totalCredits > 0 ? (user.creditsUsed / totalCredits) * 100 : 0;
     const canRecharge = !user.recharged;
 
-    const crudLibrary = new CrudLibrary(user.apiKey, user.apiUrl, refreshUserData); // Modify this line
+
 
     const handleRechargeRequest = async () => {
         if (!user) return;
@@ -30,8 +29,16 @@ export const CreditStatusCard = () => {
             });
             
             if (response.data.success) {
-                toast.success(response.data.message);
-                await refreshUserData(); // Refresh user data after recharge
+                toast.success("Recharge request sent successfully. Please wait for 2 min.");
+                
+                // Simulate email sending
+                setTimeout(() => {
+                    refreshUserData();
+                    toast.success(response.data.message);    
+                },20000)
+                
+                // Optionally, you can refresh user data here
+                // await refreshUserData(); // Refresh user data after recharge
             } else {
                 toast.error(response.data.message || "Failed to recharge credits");
             }
@@ -41,7 +48,7 @@ export const CreditStatusCard = () => {
             toast.error(errorMessage);
         }
     };
-    
+
     return (
         <Card className="shadow-md">
             <CardHeader>
@@ -66,7 +73,7 @@ export const CreditStatusCard = () => {
                                     {user.creditsUsed} used
                                 </span>
                             </div>
-                            <Progress value={percentUsed} className="h-2" />
+                            <Progress value={percentUsed}  />
                         </div>
 
                         {/* Body */}

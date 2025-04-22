@@ -41,7 +41,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             email: authResponse.data.email,
             image: authResponse.data.image || null,
             apiKey: authResponse.data.apiKey,
-            apiUrl: authResponse.data.apiUrl || "https://api.crudlibrary.com/v1",
             googleId: googleInfo.data.sub,
             credits: authResponse.data.creditsRemaining, 
             creditsUsed: authResponse.data.creditsUsed,
@@ -106,7 +105,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 email: latestUserDataBackend.email,
                 image: latestUserDataBackend.image || null,
                 apiKey: latestUserDataBackend.apiKey,
-                apiUrl: latestUserDataBackend.apiUrl || "https://api.crudlibrary.com/v1",
                 googleId: user.googleId, // Keep original googleId from login state
                 credits: latestUserDataBackend.creditsRemaining,
                 creditsUsed: latestUserDataBackend.creditsUsed,
@@ -116,7 +114,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             };
             setUser(updatedUser);
             localStorage.setItem("user", JSON.stringify(updatedUser));
-            toast.success("User data refreshed");
         } else {
             toast.error("Failed to refresh user data: " + (response.data.message || "Unknown error"));
         }

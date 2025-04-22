@@ -1,15 +1,19 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "name" TEXT,
+    "email" TEXT NOT NULL,
+    "image" TEXT,
+    "googleId" TEXT NOT NULL,
+    "apiKey" TEXT NOT NULL,
+    "credits" INTEGER NOT NULL DEFAULT 4,
+    "creditsUsed" INTEGER NOT NULL DEFAULT 0,
+    "recharged" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
-  - You are about to drop the column `canRecharge` on the `User` table. All the data in the column will be lost.
-  - You are about to drop the column `creditsRemaining` on the `User` table. All the data in the column will be lost.
-
-*/
--- AlterTable
-ALTER TABLE "User" DROP COLUMN "canRecharge",
-DROP COLUMN "creditsRemaining",
-ADD COLUMN     "credits" INTEGER NOT NULL DEFAULT 4,
-ADD COLUMN     "recharged" BOOLEAN NOT NULL DEFAULT false;
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Item" (
@@ -43,6 +47,15 @@ CREATE TABLE "ApiUsageLog" (
 
     CONSTRAINT "ApiUsageLog_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_googleId_key" ON "User"("googleId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_apiKey_key" ON "User"("apiKey");
 
 -- AddForeignKey
 ALTER TABLE "Item" ADD CONSTRAINT "Item_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

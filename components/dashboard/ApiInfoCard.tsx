@@ -15,7 +15,7 @@ export const ApiInfoCard = () => {
         return null;
     }
     const baseUrl = process.env.NEXT_API_BASE_URL || 'http://localhost:3000';
-    const apiUrl = `${baseUrl}/api/items`;
+    const apiUrl = `${baseUrl}/api`;
 
     const handleCopyApiKey = () => {
         navigator.clipboard.writeText(user.apiKey);

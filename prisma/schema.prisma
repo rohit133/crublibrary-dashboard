@@ -16,7 +16,6 @@ model User {
   googleId     String    @unique
 
   apiKey       String    @unique
-  apiUrl       String?
   credits      Int       @default(4)
   creditsUsed  Int       @default(0)
   recharged    Boolean   @default(false)

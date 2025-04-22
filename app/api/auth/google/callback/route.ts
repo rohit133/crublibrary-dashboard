@@ -34,7 +34,6 @@ export async function POST(request: Request) {
         name: name || null,
         image: picture || null,
         apiKey: newApiKey,
-        apiUrl: "https://api.crudlibrary.com/v1",
       };
 
       try {
@@ -68,7 +67,6 @@ export async function POST(request: Request) {
       name: user.name,
       image: user.image,
       apiKey: user.apiKey,
-      apiUrl: user.apiUrl,
       creditsRemaining: user.credits,
       creditsUsed: user.creditsUsed,
       canRecharge: !user.recharged,

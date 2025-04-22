@@ -1219,7 +1219,6 @@ export namespace Prisma {
     image: string | null
     googleId: string | null
     apiKey: string | null
-    apiUrl: string | null
     credits: number | null
     creditsUsed: number | null
     recharged: boolean | null
@@ -1234,7 +1233,6 @@ export namespace Prisma {
     image: string | null
     googleId: string | null
     apiKey: string | null
-    apiUrl: string | null
     credits: number | null
     creditsUsed: number | null
     recharged: boolean | null
@@ -1249,7 +1247,6 @@ export namespace Prisma {
     image: number
     googleId: number
     apiKey: number
-    apiUrl: number
     credits: number
     creditsUsed: number
     recharged: number
@@ -1276,7 +1273,6 @@ export namespace Prisma {
     image?: true
     googleId?: true
     apiKey?: true
-    apiUrl?: true
     credits?: true
     creditsUsed?: true
     recharged?: true
@@ -1291,7 +1287,6 @@ export namespace Prisma {
     image?: true
     googleId?: true
     apiKey?: true
-    apiUrl?: true
     credits?: true
     creditsUsed?: true
     recharged?: true
@@ -1306,7 +1301,6 @@ export namespace Prisma {
     image?: true
     googleId?: true
     apiKey?: true
-    apiUrl?: true
     credits?: true
     creditsUsed?: true
     recharged?: true
@@ -1408,7 +1402,6 @@ export namespace Prisma {
     image: string | null
     googleId: string
     apiKey: string
-    apiUrl: string | null
     credits: number
     creditsUsed: number
     recharged: boolean
@@ -1442,7 +1435,6 @@ export namespace Prisma {
     image?: boolean
     googleId?: boolean
     apiKey?: boolean
-    apiUrl?: boolean
     credits?: boolean
     creditsUsed?: boolean
     recharged?: boolean
@@ -1461,7 +1453,6 @@ export namespace Prisma {
     image?: boolean
     googleId?: boolean
     apiKey?: boolean
-    apiUrl?: boolean
     credits?: boolean
     creditsUsed?: boolean
     recharged?: boolean
@@ -1476,7 +1467,6 @@ export namespace Prisma {
     image?: boolean
     googleId?: boolean
     apiKey?: boolean
-    apiUrl?: boolean
     credits?: boolean
     creditsUsed?: boolean
     recharged?: boolean
@@ -1491,7 +1481,6 @@ export namespace Prisma {
     image?: boolean
     googleId?: boolean
     apiKey?: boolean
-    apiUrl?: boolean
     credits?: boolean
     creditsUsed?: boolean
     recharged?: boolean
@@ -1499,7 +1488,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "image" | "googleId" | "apiKey" | "apiUrl" | "credits" | "creditsUsed" | "recharged" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "image" | "googleId" | "apiKey" | "credits" | "creditsUsed" | "recharged" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     items?: boolean | User$itemsArgs<ExtArgs>
     logs?: boolean | User$logsArgs<ExtArgs>
@@ -1523,7 +1512,6 @@ export namespace Prisma {
       image: string | null
       googleId: string
       apiKey: string
-      apiUrl: string | null
       credits: number
       creditsUsed: number
       recharged: boolean
@@ -1961,7 +1949,6 @@ export namespace Prisma {
     readonly image: FieldRef<"User", 'String'>
     readonly googleId: FieldRef<"User", 'String'>
     readonly apiKey: FieldRef<"User", 'String'>
-    readonly apiUrl: FieldRef<"User", 'String'>
     readonly credits: FieldRef<"User", 'Int'>
     readonly creditsUsed: FieldRef<"User", 'Int'>
     readonly recharged: FieldRef<"User", 'Boolean'>
@@ -5750,7 +5737,6 @@ export namespace Prisma {
     image: 'image',
     googleId: 'googleId',
     apiKey: 'apiKey',
-    apiUrl: 'apiUrl',
     credits: 'credits',
     creditsUsed: 'creditsUsed',
     recharged: 'recharged',
@@ -5899,7 +5885,6 @@ export namespace Prisma {
     image?: StringNullableFilter<"User"> | string | null
     googleId?: StringFilter<"User"> | string
     apiKey?: StringFilter<"User"> | string
-    apiUrl?: StringNullableFilter<"User"> | string | null
     credits?: IntFilter<"User"> | number
     creditsUsed?: IntFilter<"User"> | number
     recharged?: BoolFilter<"User"> | boolean
@@ -5917,7 +5902,6 @@ export namespace Prisma {
     image?: SortOrderInput | SortOrder
     googleId?: SortOrder
     apiKey?: SortOrder
-    apiUrl?: SortOrderInput | SortOrder
     credits?: SortOrder
     creditsUsed?: SortOrder
     recharged?: SortOrder
@@ -5938,7 +5922,6 @@ export namespace Prisma {
     NOT?: UserWhereInput | UserWhereInput[]
     name?: StringNullableFilter<"User"> | string | null
     image?: StringNullableFilter<"User"> | string | null
-    apiUrl?: StringNullableFilter<"User"> | string | null
     credits?: IntFilter<"User"> | number
     creditsUsed?: IntFilter<"User"> | number
     recharged?: BoolFilter<"User"> | boolean
@@ -5956,7 +5939,6 @@ export namespace Prisma {
     image?: SortOrderInput | SortOrder
     googleId?: SortOrder
     apiKey?: SortOrder
-    apiUrl?: SortOrderInput | SortOrder
     credits?: SortOrder
     creditsUsed?: SortOrder
     recharged?: SortOrder
@@ -5979,7 +5961,6 @@ export namespace Prisma {
     image?: StringNullableWithAggregatesFilter<"User"> | string | null
     googleId?: StringWithAggregatesFilter<"User"> | string
     apiKey?: StringWithAggregatesFilter<"User"> | string
-    apiUrl?: StringNullableWithAggregatesFilter<"User"> | string | null
     credits?: IntWithAggregatesFilter<"User"> | number
     creditsUsed?: IntWithAggregatesFilter<"User"> | number
     recharged?: BoolWithAggregatesFilter<"User"> | boolean
@@ -6165,7 +6146,6 @@ export namespace Prisma {
     image?: string | null
     googleId: string
     apiKey: string
-    apiUrl?: string | null
     credits?: number
     creditsUsed?: number
     recharged?: boolean
@@ -6183,7 +6163,6 @@ export namespace Prisma {
     image?: string | null
     googleId: string
     apiKey: string
-    apiUrl?: string | null
     credits?: number
     creditsUsed?: number
     recharged?: boolean
@@ -6201,7 +6180,6 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: StringFieldUpdateOperationsInput | string
     apiKey?: StringFieldUpdateOperationsInput | string
-    apiUrl?: NullableStringFieldUpdateOperationsInput | string | null
     credits?: IntFieldUpdateOperationsInput | number
     creditsUsed?: IntFieldUpdateOperationsInput | number
     recharged?: BoolFieldUpdateOperationsInput | boolean
@@ -6219,7 +6197,6 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: StringFieldUpdateOperationsInput | string
     apiKey?: StringFieldUpdateOperationsInput | string
-    apiUrl?: NullableStringFieldUpdateOperationsInput | string | null
     credits?: IntFieldUpdateOperationsInput | number
     creditsUsed?: IntFieldUpdateOperationsInput | number
     recharged?: BoolFieldUpdateOperationsInput | boolean
@@ -6237,7 +6214,6 @@ export namespace Prisma {
     image?: string | null
     googleId: string
     apiKey: string
-    apiUrl?: string | null
     credits?: number
     creditsUsed?: number
     recharged?: boolean
@@ -6252,7 +6228,6 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: StringFieldUpdateOperationsInput | string
     apiKey?: StringFieldUpdateOperationsInput | string
-    apiUrl?: NullableStringFieldUpdateOperationsInput | string | null
     credits?: IntFieldUpdateOperationsInput | number
     creditsUsed?: IntFieldUpdateOperationsInput | number
     recharged?: BoolFieldUpdateOperationsInput | boolean
@@ -6267,7 +6242,6 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: StringFieldUpdateOperationsInput | string
     apiKey?: StringFieldUpdateOperationsInput | string
-    apiUrl?: NullableStringFieldUpdateOperationsInput | string | null
     credits?: IntFieldUpdateOperationsInput | number
     creditsUsed?: IntFieldUpdateOperationsInput | number
     recharged?: BoolFieldUpdateOperationsInput | boolean
@@ -6530,7 +6504,6 @@ export namespace Prisma {
     image?: SortOrder
     googleId?: SortOrder
     apiKey?: SortOrder
-    apiUrl?: SortOrder
     credits?: SortOrder
     creditsUsed?: SortOrder
     recharged?: SortOrder
@@ -6550,7 +6523,6 @@ export namespace Prisma {
     image?: SortOrder
     googleId?: SortOrder
     apiKey?: SortOrder
-    apiUrl?: SortOrder
     credits?: SortOrder
     creditsUsed?: SortOrder
     recharged?: SortOrder
@@ -6565,7 +6537,6 @@ export namespace Prisma {
     image?: SortOrder
     googleId?: SortOrder
     apiKey?: SortOrder
-    apiUrl?: SortOrder
     credits?: SortOrder
     creditsUsed?: SortOrder
     recharged?: SortOrder
@@ -7306,7 +7277,6 @@ export namespace Prisma {
     image?: string | null
     googleId: string
     apiKey: string
-    apiUrl?: string | null
     credits?: number
     creditsUsed?: number
     recharged?: boolean
@@ -7323,7 +7293,6 @@ export namespace Prisma {
     image?: string | null
     googleId: string
     apiKey: string
-    apiUrl?: string | null
     credits?: number
     creditsUsed?: number
     recharged?: boolean
@@ -7356,7 +7325,6 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: StringFieldUpdateOperationsInput | string
     apiKey?: StringFieldUpdateOperationsInput | string
-    apiUrl?: NullableStringFieldUpdateOperationsInput | string | null
     credits?: IntFieldUpdateOperationsInput | number
     creditsUsed?: IntFieldUpdateOperationsInput | number
     recharged?: BoolFieldUpdateOperationsInput | boolean
@@ -7373,7 +7341,6 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: StringFieldUpdateOperationsInput | string
     apiKey?: StringFieldUpdateOperationsInput | string
-    apiUrl?: NullableStringFieldUpdateOperationsInput | string | null
     credits?: IntFieldUpdateOperationsInput | number
     creditsUsed?: IntFieldUpdateOperationsInput | number
     recharged?: BoolFieldUpdateOperationsInput | boolean
@@ -7390,7 +7357,6 @@ export namespace Prisma {
     image?: string | null
     googleId: string
     apiKey: string
-    apiUrl?: string | null
     credits?: number
     creditsUsed?: number
     recharged?: boolean
@@ -7407,7 +7373,6 @@ export namespace Prisma {
     image?: string | null
     googleId: string
     apiKey: string
-    apiUrl?: string | null
     credits?: number
     creditsUsed?: number
     recharged?: boolean
@@ -7440,7 +7405,6 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: StringFieldUpdateOperationsInput | string
     apiKey?: StringFieldUpdateOperationsInput | string
-    apiUrl?: NullableStringFieldUpdateOperationsInput | string | null
     credits?: IntFieldUpdateOperationsInput | number
     creditsUsed?: IntFieldUpdateOperationsInput | number
     recharged?: BoolFieldUpdateOperationsInput | boolean
@@ -7457,7 +7421,6 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: StringFieldUpdateOperationsInput | string
     apiKey?: StringFieldUpdateOperationsInput | string
-    apiUrl?: NullableStringFieldUpdateOperationsInput | string | null
     credits?: IntFieldUpdateOperationsInput | number
     creditsUsed?: IntFieldUpdateOperationsInput | number
     recharged?: BoolFieldUpdateOperationsInput | boolean
@@ -7474,7 +7437,6 @@ export namespace Prisma {
     image?: string | null
     googleId: string
     apiKey: string
-    apiUrl?: string | null
     credits?: number
     creditsUsed?: number
     recharged?: boolean
@@ -7491,7 +7453,6 @@ export namespace Prisma {
     image?: string | null
     googleId: string
     apiKey: string
-    apiUrl?: string | null
     credits?: number
     creditsUsed?: number
     recharged?: boolean
@@ -7524,7 +7485,6 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: StringFieldUpdateOperationsInput | string
     apiKey?: StringFieldUpdateOperationsInput | string
-    apiUrl?: NullableStringFieldUpdateOperationsInput | string | null
     credits?: IntFieldUpdateOperationsInput | number
     creditsUsed?: IntFieldUpdateOperationsInput | number
     recharged?: BoolFieldUpdateOperationsInput | boolean
@@ -7541,7 +7501,6 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: StringFieldUpdateOperationsInput | string
     apiKey?: StringFieldUpdateOperationsInput | string
-    apiUrl?: NullableStringFieldUpdateOperationsInput | string | null
     credits?: IntFieldUpdateOperationsInput | number
     creditsUsed?: IntFieldUpdateOperationsInput | number
     recharged?: BoolFieldUpdateOperationsInput | boolean

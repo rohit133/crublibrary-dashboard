@@ -4,7 +4,6 @@ export interface User {
   email: string;
   image: string | null;
   apiKey: string;
-  apiUrl: string;
   googleId: string;
   creditsUsed: number;
   credits: number;  
