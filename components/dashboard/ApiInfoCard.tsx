@@ -14,9 +14,10 @@ export const ApiInfoCard = () => {
     if (!user) {
         return null;
     }
-    const baseUrl = process.env.NEXT_API_BASE_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_API_BASE_URL || 'https://crublibrary-dashboard-crud.vercel.app/dashboards';
     const apiUrl = `${baseUrl}/api`;
 
+    
     const handleCopyApiKey = () => {
         navigator.clipboard.writeText(user.apiKey);
         setApiKeyCopied(true);
