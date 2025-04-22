@@ -14,6 +14,8 @@ export const ApiInfoCard = () => {
     if (!user) {
         return null;
     }
+    const baseUrl = process.env.NEXT_API_BASE_URL || 'http://localhost:3000';
+    const apiUrl = `${baseUrl}/api/items`;
 
     const handleCopyApiKey = () => {
         navigator.clipboard.writeText(user.apiKey);
@@ -23,9 +25,9 @@ export const ApiInfoCard = () => {
     }
 
     const handleCopyApiUrl = () => {
-        // Add a null check to handle the case when apiUrl is null
-        if (user.apiUrl) {
-            navigator.clipboard.writeText(user.apiUrl);
+ 
+        if (apiUrl) {
+            navigator.clipboard.writeText(apiUrl);
             setApiUrlCopied(true);
             toast.success('API URL copied to clipboard');
             setTimeout(() => setApiUrlCopied(false), 2000);
@@ -35,7 +37,7 @@ export const ApiInfoCard = () => {
     }
 
     // Default API URL if user.apiUrl is null
-    const apiUrl = user.apiUrl || 'https://api.crudlibrary.com/v1';
+    // const apiUrl = user.apiUrl || 'https://api.crudlibrary.com/v1';
 
     return (
         <Card className="shadow-md card-gradient">

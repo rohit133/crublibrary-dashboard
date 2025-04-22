@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Progress } from '@/components/ui/progress';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
 import axios from "axios";
+import CrudLibrary from "@/lib/CrudLibrary";
 
 export const CreditStatusCard = () => {
     const { user, refreshUserData, loading } = useAuth();
@@ -17,6 +18,8 @@ export const CreditStatusCard = () => {
     const totalCredits = user.creditsUsed + user.credits;
     const percentUsed = totalCredits > 0 ? (user.creditsUsed / totalCredits) * 100 : 0;
     const canRecharge = !user.recharged;
+
+    const crudLibrary = new CrudLibrary(user.apiKey, user.apiUrl, refreshUserData); // Modify this line
 
     const handleRechargeRequest = async () => {
         if (!user) return;
@@ -47,7 +50,6 @@ export const CreditStatusCard = () => {
                 <CardDescription>Monitor your API usage and remaining credits</CardDescription>
                 <Button variant="ghost" size="sm" onClick={refreshUserData}> <RefreshCw className="h-4 w-4 mr-2" />Refresh</Button>
                 </div>
-              
             </CardHeader>
             <CardContent className="space-y-6">
                 {loading ? (

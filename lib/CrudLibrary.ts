@@ -1,6 +1,5 @@
-
 import axios from 'axios';
-import env from './environment';
+
 
 interface CrudResponse<T> {
   success: boolean;
@@ -46,15 +45,12 @@ interface CreditInfo {
 class CrudLibrary {
   private apiKey: string;
   private apiUrl: string;
+  private refreshUserData: () => Promise<void>;
 
-  constructor(apiKey?: string, apiUrl?: string) {
-    // Use provided values or defaults from environment
-    this.apiKey = apiKey || env.CRUD_API_KEY;
-    this.apiUrl = apiUrl || env.CRUD_API_URL;
-
-    if (!this.apiKey || !this.apiUrl) {
-      throw new Error('API key and URL are required.');
-    }
+  constructor(apiKey: string, apiUrl: string, refreshUserData: () => Promise<void>) {
+    this.apiKey = apiKey;
+    this.apiUrl = apiUrl;
+    this.refreshUserData = refreshUserData;
   }
 
   private async makeRequest<T>(method: string, endpoint: string, data?: any): Promise<CrudResponse<T>> {
@@ -78,6 +74,10 @@ class CrudLibrary {
           break;
         default:
           throw new Error(`Unsupported method: ${method}`);
+      }
+
+      if (this.refreshUserData) {
+        await this.refreshUserData();
       }
 
       return response.data;
