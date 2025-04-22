@@ -72,7 +72,7 @@ export async function PUT(
   const apiKey =
     request.headers.get("Authorization")?.split("Bearer ")[1] ||
     request.headers.get("X-API-Key");
-  const { txHash } = await params;
+    const { txHash } = await params;
 
   if (!apiKey) {
     return NextResponse.json({ message: "API Key missing" }, { status: 401, headers: corsHeaders });
