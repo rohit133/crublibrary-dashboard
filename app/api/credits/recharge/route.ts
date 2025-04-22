@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { rechargeUserCredits } from '@/lib/db/users';
 import { recordApiUsage } from '@/lib/db/apiUsage';
+import { corsHeaders } from "@/lib/cors-header";
 
 // Define how many credits are added on recharge
 const RECHARGE_CREDIT_AMOUNT = 4;
@@ -25,7 +26,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     if (!userId) {
       return NextResponse.json(
         { success: false, message: 'User ID is required' }, 
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -44,7 +45,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       success: true,
       data: responseData,
       message: `Successfully recharged ${RECHARGE_CREDIT_AMOUNT} credits.`
-    });
+    }, { status: 200, headers: corsHeaders });
     
   } catch (error) {
     console.error('Credit recharge error:', error);
@@ -52,14 +53,14 @@ export async function POST(request: Request): Promise<NextResponse> {
     if (error instanceof Error && error.message === 'User has already recharged') {
       return NextResponse.json(
         { success: false, message: 'Recharge not available or already used.' },
-        { status: 403 }
+        { status: 403, headers: corsHeaders }
       );
     }
     
     if (error instanceof Error && error.message === 'User not found') {
       return NextResponse.json(
         { success: false, message: 'User not found' },
-        { status: 404 }
+        { status: 404, headers: corsHeaders }
       );
     }
     
@@ -70,7 +71,15 @@ export async function POST(request: Request): Promise<NextResponse> {
         message: 'Failed to recharge credits', 
         error: process.env.NODE_ENV === 'development' ? errorMessage : 'Internal Server Error' 
       },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
+}
+
+// Handle CORS preflight requests
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
 }

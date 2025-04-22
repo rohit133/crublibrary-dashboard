@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { NextRequest } from "next/server";
 import { validateKeyAndDecrementCredits } from "@/lib/api-utils";
+import { corsHeaders } from "@/lib/cors-header";
+
 
 /**
  * @description API route handler for fetching a specific item by its ID.
@@ -23,54 +25,51 @@ export async function GET(
   const apiKey =
     request.headers.get("Authorization")?.split("Bearer ")[1] ||
     request.headers.get("X-API-Key");
-    const { id } = await params;
+  const { id } = await params;
 
   if (!apiKey) {
-    return NextResponse.json({ message: "API Key missing" }, { status: 401 });
+    return NextResponse.json({ message: "API Key missing" }, { status: 401, headers: corsHeaders });
   }
 
   if (!id || isNaN(parseInt(id))) {
-    return NextResponse.json({ message: "Invalid ID format" }, { status: 400 });
+    return NextResponse.json({ message: "Invalid ID format" }, { status: 400, headers: corsHeaders });
   }
   const itemId = parseInt(id);
 
   try {
-    // Call enhanced validation function first
     const validationResult = await validateKeyAndDecrementCredits(apiKey);
     if (validationResult.error) {
       return NextResponse.json(
         { message: validationResult.error.message },
-        { status: validationResult.error.status }
+        { status: validationResult.error.status, headers: corsHeaders }
       );
     }
     const user = validationResult.user;
     if (!user) {
       return NextResponse.json(
         { message: "Validation failed unexpectedly" },
-        { status: 500 }
+        { status: 500, headers: corsHeaders }
       );
     }
 
-    // Proceed with getting the item
     const item = await prisma.item.findUnique({
       where: {
         id: itemId,
-        userId: user.id, // Ensure the item belongs to the validated user
+        userId: user.id,
       },
       select: { value: true, txHash: true },
     });
 
     if (!item) {
-      // Credits were already decremented. Rollback?
-      return NextResponse.json({ message: "Item not found" }, { status: 404 });
+      return NextResponse.json({ message: "Item not found" }, { status: 404, headers: corsHeaders });
     }
 
-    return NextResponse.json(item, { status: 200 });
+    return NextResponse.json(item, { status: 200, headers: corsHeaders });
   } catch (error) {
     console.error(`GET /api/items/${id} Error:`, error);
     return NextResponse.json(
       { message: "Internal Server Error" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
@@ -95,54 +94,52 @@ export async function PUT(
   const apiKey =
     request.headers.get("Authorization")?.split("Bearer ")[1] ||
     request.headers.get("X-API-Key");
-    const { id } = await params;
+  const { id } = await params;
 
   if (!apiKey) {
-    return NextResponse.json({ message: "API Key missing" }, { status: 401 });
+    return NextResponse.json({ message: "API Key missing" }, { status: 401, headers: corsHeaders });
   }
 
   if (!id || isNaN(parseInt(id))) {
-    return NextResponse.json({ message: "Invalid ID format" }, { status: 400 });
+    return NextResponse.json({ message: "Invalid ID format" }, { status: 400, headers: corsHeaders });
   }
   const itemId = parseInt(id);
 
   try {
-    // Call enhanced validation function first
     const validationResult = await validateKeyAndDecrementCredits(apiKey);
     if (validationResult.error) {
       return NextResponse.json(
         { message: validationResult.error.message },
-        { status: validationResult.error.status }
+        { status: validationResult.error.status, headers: corsHeaders }
       );
     }
     const user = validationResult.user;
     if (!user) {
       return NextResponse.json(
         { message: "Validation failed unexpectedly" },
-        { status: 500 }
+        { status: 500, headers: corsHeaders }
       );
     }
 
-    // Proceed with update
     const body = await request.json();
     const { value, txHash } = body;
 
     if (value === undefined && txHash === undefined) {
       return NextResponse.json(
         { message: "No update data provided" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
     if (value !== undefined && typeof value !== "number") {
       return NextResponse.json(
         { message: "Invalid input: value must be a number" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
     if (txHash !== undefined && typeof txHash !== "string") {
       return NextResponse.json(
         { message: "Invalid input: txHash must be a string" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -156,28 +153,27 @@ export async function PUT(
     });
 
     if (updateResult.count === 0) {
-      // Credits were already decremented. Rollback?
       return NextResponse.json(
         { message: "Item not found or not owned by user" },
-        { status: 404 }
+        { status: 404, headers: corsHeaders }
       );
     }
 
     return NextResponse.json(
       { status: "updated successfully" },
-      { status: 200 }
+      { status: 200, headers: corsHeaders }
     );
   } catch (error) {
     console.error(`PUT /api/items/${id} Error:`, error);
     if (error instanceof SyntaxError) {
       return NextResponse.json(
         { message: "Invalid JSON body" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
     return NextResponse.json(
       { message: "Internal Server Error" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
@@ -202,56 +198,61 @@ export async function DELETE(
   const apiKey =
     request.headers.get("Authorization")?.split("Bearer ")[1] ||
     request.headers.get("X-API-Key");
-    const { id } = await params;
+  const { id } = await params;
 
   if (!apiKey) {
-    return NextResponse.json({ message: "API Key missing" }, { status: 401 });
+    return NextResponse.json({ message: "API Key missing" }, { status: 401, headers: corsHeaders });
   }
 
   if (!id || isNaN(parseInt(id))) {
-    return NextResponse.json({ message: "Invalid ID format" }, { status: 400 });
+    return NextResponse.json({ message: "Invalid ID format" }, { status: 400, headers: corsHeaders });
   }
   const itemId = parseInt(id);
 
   try {
-    // Call enhanced validation function first
     const validationResult = await validateKeyAndDecrementCredits(apiKey);
     if (validationResult.error) {
       return NextResponse.json(
         { message: validationResult.error.message },
-        { status: validationResult.error.status }
+        { status: validationResult.error.status, headers: corsHeaders }
       );
     }
     const user = validationResult.user;
     if (!user) {
       return NextResponse.json(
         { message: "Validation failed unexpectedly" },
-        { status: 500 }
+        { status: 500, headers: corsHeaders }
       );
     }
 
-    // Proceed with delete
     const deleteResult = await prisma.item.deleteMany({
       where: { id: itemId, userId: user.id },
     });
 
     if (deleteResult.count === 0) {
-      // Credits were already decremented. Rollback?
       return NextResponse.json(
         { message: "Item not found or not owned by user" },
-        { status: 404 }
+        { status: 404, headers: corsHeaders }
       );
     }
 
     return NextResponse.json(
       { status: "deleted successfully" },
-      { status: 200 }
+      { status: 200, headers: corsHeaders }
     );
   } catch (error) {
     console.error(`DELETE /api/items/${id} Error:`, error);
     return NextResponse.json(
       { message: "Internal Server Error" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
+}
+
+// Handle CORS preflight requests
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
 }
