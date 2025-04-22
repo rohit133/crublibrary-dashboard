@@ -42,9 +42,9 @@ export const CreditStatusCard = () => {
             } else {
                 toast.error(response.data.message || "Failed to recharge credits");
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Recharge error:', error);
-            const errorMessage = error?.response?.data?.message || error?.message || 'An error occurred while processing your recharge request';
+            const errorMessage = (error as any)?.response?.data?.message || (error as any)?.message || 'An error occurred while processing your recharge request';
             toast.error(errorMessage);
         }
     };
@@ -80,7 +80,7 @@ export const CreditStatusCard = () => {
                         <div className="p-4 rounded-md border">
                             <h4 className="font-medium mb-2">Need More Credits?</h4>
                             <p className="text-sm mb-4">
-                                Send an email to <span className="font-medium">hirings@formpilot.org</span> with the subject "Please recharge my credits"
+                                Send an email to <span className="font-medium">hirings@formpilot.org</span> with the subject &quot;Please recharge my credits&quot;
                             </p>
                             {canRecharge ? (
                                 <Button variant="outline" size="sm" className="flex items-center gap-2 text-white-700 hover:text-gray-800 hover:bg-gray-100" onClick={handleRechargeRequest}>
@@ -88,7 +88,7 @@ export const CreditStatusCard = () => {
                                     <span>Simulate Email Request</span>
                                 </Button>
                             ) : (
-                                <div className="text-sm text-red-600 p-2 bg-red-50 rounded-md">You've already recharged once. No additional recharges are available.</div>
+                                <div className="text-sm text-red-600 p-2 bg-red-50 rounded-md">You&apos;ve already recharged once. No additional recharges are available.</div>
                             )}
                         </div>
                     </>

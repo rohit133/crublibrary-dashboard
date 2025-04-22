@@ -6,9 +6,9 @@ import { validateKeyAndDecrementCredits } from "@/lib/api-utils";
 /**
  * @description API route handler for fetching a specific item by its ID.
  * Authenticates the request, validates the API key, decrements credits, and retrieves the item if it belongs to the user.
- * @param {NextRequest} request - The incoming Next.js request object. Must contain 'Authorization' or 'X-API-Key' header.
+ * @param { NextRequest} request - The incoming Next.js request object. Must contain 'Authorization' or 'X-API-Key' header.
  * @param {{ params: { id: string } }} params - The route parameters, containing the item ID.
- * @returns {Promise<NextResponse>} A promise that resolves to a Next.js response object.
+ * @returns { Promise<NextResponse> } A promise that resolves to a Next.js response object.
  * Returns 200 with the item data ({ value, txHash }) on success.
  * Returns 401 if the API key is missing.
  * Returns 400 if the item ID format is invalid.
@@ -16,16 +16,21 @@ import { validateKeyAndDecrementCredits } from "@/lib/api-utils";
  * Returns 404 if the item is not found or does not belong to the user.
  * Returns 500 for internal server errors or unexpected validation failures.
  */
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  const apiKey = request.headers.get('Authorization')?.split('Bearer ')[1] || request.headers.get('X-API-Key');
-  const id = params.id;
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse> {
+  const apiKey =
+    request.headers.get("Authorization")?.split("Bearer ")[1] ||
+    request.headers.get("X-API-Key");
+    const { id } = await params;
 
   if (!apiKey) {
-    return NextResponse.json({ message: 'API Key missing' }, { status: 401 });
+    return NextResponse.json({ message: "API Key missing" }, { status: 401 });
   }
 
   if (!id || isNaN(parseInt(id))) {
-     return NextResponse.json({ message: 'Invalid ID format' }, { status: 400 });
+    return NextResponse.json({ message: "Invalid ID format" }, { status: 400 });
   }
   const itemId = parseInt(id);
 
@@ -33,32 +38,40 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     // Call enhanced validation function first
     const validationResult = await validateKeyAndDecrementCredits(apiKey);
     if (validationResult.error) {
-      return NextResponse.json({ message: validationResult.error.message }, { status: validationResult.error.status });
+      return NextResponse.json(
+        { message: validationResult.error.message },
+        { status: validationResult.error.status }
+      );
     }
     const user = validationResult.user;
-     if (!user) { 
-        return NextResponse.json({ message: 'Validation failed unexpectedly' }, { status: 500 });
+    if (!user) {
+      return NextResponse.json(
+        { message: "Validation failed unexpectedly" },
+        { status: 500 }
+      );
     }
 
     // Proceed with getting the item
     const item = await prisma.item.findUnique({
       where: {
         id: itemId,
-        userId: user.id // Ensure the item belongs to the validated user
+        userId: user.id, // Ensure the item belongs to the validated user
       },
-      select: { value: true, txHash: true }
+      select: { value: true, txHash: true },
     });
 
     if (!item) {
       // Credits were already decremented. Rollback?
-      return NextResponse.json({ message: 'Item not found' }, { status: 404 });
+      return NextResponse.json({ message: "Item not found" }, { status: 404 });
     }
 
     return NextResponse.json(item, { status: 200 });
-
   } catch (error) {
     console.error(`GET /api/items/${id} Error:`, error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
 
@@ -75,28 +88,39 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
  * Returns 404 if the item is not found or does not belong to the user.
  * Returns 500 for internal server errors or unexpected validation failures.
  */
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
-  const apiKey = request.headers.get('Authorization')?.split('Bearer ')[1] || request.headers.get('X-API-Key');
-  const id = params.id;
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse> {
+  const apiKey =
+    request.headers.get("Authorization")?.split("Bearer ")[1] ||
+    request.headers.get("X-API-Key");
+    const { id } = await params;
 
   if (!apiKey) {
-    return NextResponse.json({ message: 'API Key missing' }, { status: 401 });
+    return NextResponse.json({ message: "API Key missing" }, { status: 401 });
   }
 
   if (!id || isNaN(parseInt(id))) {
-    return NextResponse.json({ message: 'Invalid ID format' }, { status: 400 });
+    return NextResponse.json({ message: "Invalid ID format" }, { status: 400 });
   }
   const itemId = parseInt(id);
 
   try {
-     // Call enhanced validation function first
+    // Call enhanced validation function first
     const validationResult = await validateKeyAndDecrementCredits(apiKey);
     if (validationResult.error) {
-      return NextResponse.json({ message: validationResult.error.message }, { status: validationResult.error.status });
+      return NextResponse.json(
+        { message: validationResult.error.message },
+        { status: validationResult.error.status }
+      );
     }
     const user = validationResult.user;
-     if (!user) { 
-        return NextResponse.json({ message: 'Validation failed unexpectedly' }, { status: 500 });
+    if (!user) {
+      return NextResponse.json(
+        { message: "Validation failed unexpectedly" },
+        { status: 500 }
+      );
     }
 
     // Proceed with update
@@ -104,13 +128,22 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     const { value, txHash } = body;
 
     if (value === undefined && txHash === undefined) {
-       return NextResponse.json({ message: 'No update data provided' }, { status: 400 });
+      return NextResponse.json(
+        { message: "No update data provided" },
+        { status: 400 }
+      );
     }
-    if (value !== undefined && typeof value !== 'number') {
-       return NextResponse.json({ message: 'Invalid input: value must be a number' }, { status: 400 });
+    if (value !== undefined && typeof value !== "number") {
+      return NextResponse.json(
+        { message: "Invalid input: value must be a number" },
+        { status: 400 }
+      );
     }
-     if (txHash !== undefined && typeof txHash !== 'string') {
-       return NextResponse.json({ message: 'Invalid input: txHash must be a string' }, { status: 400 });
+    if (txHash !== undefined && typeof txHash !== "string") {
+      return NextResponse.json(
+        { message: "Invalid input: txHash must be a string" },
+        { status: 400 }
+      );
     }
 
     const updateData: { value?: number; txHash?: string } = {};
@@ -123,18 +156,29 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     });
 
     if (updateResult.count === 0) {
-       // Credits were already decremented. Rollback?
-      return NextResponse.json({ message: 'Item not found or not owned by user' }, { status: 404 });
+      // Credits were already decremented. Rollback?
+      return NextResponse.json(
+        { message: "Item not found or not owned by user" },
+        { status: 404 }
+      );
     }
 
-    return NextResponse.json({ status: "updated successfully" }, { status: 200 });
-
+    return NextResponse.json(
+      { status: "updated successfully" },
+      { status: 200 }
+    );
   } catch (error) {
     console.error(`PUT /api/items/${id} Error:`, error);
-     if (error instanceof SyntaxError) {
-        return NextResponse.json({ message: 'Invalid JSON body' }, { status: 400 });
+    if (error instanceof SyntaxError) {
+      return NextResponse.json(
+        { message: "Invalid JSON body" },
+        { status: 400 }
+      );
     }
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
 
@@ -151,28 +195,39 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
  * Returns 404 if the item is not found or does not belong to the user.
  * Returns 500 for internal server errors or unexpected validation failures.
  */
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
-  const apiKey = request.headers.get('Authorization')?.split('Bearer ')[1] || request.headers.get('X-API-Key');
-  const id = params.id;
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse> {
+  const apiKey =
+    request.headers.get("Authorization")?.split("Bearer ")[1] ||
+    request.headers.get("X-API-Key");
+    const { id } = await params;
 
   if (!apiKey) {
-    return NextResponse.json({ message: 'API Key missing' }, { status: 401 });
+    return NextResponse.json({ message: "API Key missing" }, { status: 401 });
   }
 
   if (!id || isNaN(parseInt(id))) {
-    return NextResponse.json({ message: 'Invalid ID format' }, { status: 400 });
+    return NextResponse.json({ message: "Invalid ID format" }, { status: 400 });
   }
   const itemId = parseInt(id);
 
   try {
-     // Call enhanced validation function first
+    // Call enhanced validation function first
     const validationResult = await validateKeyAndDecrementCredits(apiKey);
     if (validationResult.error) {
-      return NextResponse.json({ message: validationResult.error.message }, { status: validationResult.error.status });
+      return NextResponse.json(
+        { message: validationResult.error.message },
+        { status: validationResult.error.status }
+      );
     }
     const user = validationResult.user;
-     if (!user) { 
-        return NextResponse.json({ message: 'Validation failed unexpectedly' }, { status: 500 });
+    if (!user) {
+      return NextResponse.json(
+        { message: "Validation failed unexpectedly" },
+        { status: 500 }
+      );
     }
 
     // Proceed with delete
@@ -181,14 +236,22 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     });
 
     if (deleteResult.count === 0) {
-       // Credits were already decremented. Rollback?
-      return NextResponse.json({ message: 'Item not found or not owned by user' }, { status: 404 });
+      // Credits were already decremented. Rollback?
+      return NextResponse.json(
+        { message: "Item not found or not owned by user" },
+        { status: 404 }
+      );
     }
 
-    return NextResponse.json({ status: "deleted successfully" }, { status: 200 });
-
+    return NextResponse.json(
+      { status: "deleted successfully" },
+      { status: 200 }
+    );
   } catch (error) {
     console.error(`DELETE /api/items/${id} Error:`, error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
-} 
+}

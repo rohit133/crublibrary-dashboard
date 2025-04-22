@@ -16,7 +16,7 @@ import { validateKeyAndDecrementCredits } from "@/lib/api-utils";
  * Returns 500 for internal server errors.
  */
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<NextResponse> {
   const apiKey = request.headers.get('Authorization')?.split('Bearer ')[1] || request.headers.get('X-API-Key');
 
   if (!apiKey) {

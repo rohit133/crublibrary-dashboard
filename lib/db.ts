@@ -1,5 +1,6 @@
 import { PrismaClient } from './generated/prisma';
 declare global {
+  /*eslint no-var: "error"*/
   var prisma: PrismaClient | undefined
 }
 

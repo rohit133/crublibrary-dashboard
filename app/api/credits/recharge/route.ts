@@ -18,7 +18,7 @@ const RECHARGE_CREDIT_AMOUNT = 4;
  * Returns 404 if the user is not found.
  * Returns 500 for internal server errors.
  */
-export async function POST(request: Request) {
+export async function POST(request: Request): Promise<NextResponse> {
   try {
     const { userId } = await request.json(); 
     

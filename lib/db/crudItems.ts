@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/db';
 import crypto from 'crypto';
-import { CrudItem } from '@/types';
 
 /**
  * @description Creates a new CRUD item associated with a user.

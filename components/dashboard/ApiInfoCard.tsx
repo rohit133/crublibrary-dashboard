@@ -78,7 +78,7 @@ export const ApiInfoCard = () => {
             </CardContent>
             <CardFooter>
                 <p className="text-sm">
-                    Keep your API key secure and don't share it publicly.
+                    Keep your API key secure and don&apos;t share it publicly.
                 </p>
             </CardFooter>
         </Card>

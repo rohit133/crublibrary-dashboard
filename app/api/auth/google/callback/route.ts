@@ -14,7 +14,7 @@ import { generateApiKey } from '@/lib/api-key-utils';
  * Returns 400 if required user information (googleId, email) is missing.
  * Returns 500 for database errors during user lookup, creation, or update, or other internal server errors.
  */
-export async function POST(request: Request) {
+export async function POST(request: Request): Promise<NextResponse> {
   try {
     const requestBody = await request.json();
     const { googleId, email, name, picture } = requestBody;
@@ -32,6 +32,7 @@ export async function POST(request: Request) {
         where: { googleId }
       });
     } catch (dbError) {
+      console.error('Database error during user lookup:', dbError);
       return NextResponse.json(
         { success: false, message: 'Database error during user lookup' },
         { status: 500 }
@@ -51,6 +52,7 @@ export async function POST(request: Request) {
       try {
         user = await prisma.user.create({ data: newUserInput });
       } catch (dbError) {
+        console.error('Database error during user create:', dbError); 
         return NextResponse.json(
           { success: false, message: 'Database error during user creation' },
           { status: 500 }
@@ -65,6 +67,7 @@ export async function POST(request: Request) {
         try {
           user = await prisma.user.update({ where: { id: user.id }, data: updateData });
         } catch (dbError) {
+          console.error('Database error during user update:', dbError); 
           return NextResponse.json(
             { success: false, message: 'Database error during user update' },
             { status: 500 }

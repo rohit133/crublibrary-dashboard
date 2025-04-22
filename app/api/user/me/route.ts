@@ -12,7 +12,7 @@ import { NextRequest } from "next/server";
  * Returns 404 if the user is not found.
  * Returns 500 for internal server errors.
  */
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<NextResponse> {
   const userId = request.headers.get('X-User-ID');
   if (!userId) {
     return NextResponse.json({ message: 'User ID missing in headers' }, { status: 401 });
